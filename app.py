@@ -18,34 +18,37 @@ if "selected_terms" not in st.session_state:
 
 # ---- Mostrar el texto en pantalla ----
 st.write("### Texto:")
-st.markdown(f"<div id='texto' style='border:1px solid gray; padding:10px;'>{texto}</div>", unsafe_allow_html=True)
+st.markdown(
+    f"<div id='text-block' style='border:1px solid gray; padding:10px;'>{texto}</div>",
+    unsafe_allow_html=True,
+)
 
-# ---- JavaScript para capturar la selección de texto ----
+# ---- JavaScript para capturar automáticamente la selección de texto ----
 custom_js = """
 <script>
-    function sendSelectionToStreamlit() {
+    document.addEventListener("mouseup", function() {
         var selectedText = window.getSelection().toString().trim();
         if (selectedText.length > 0) {
-            var streamlitInput = window.parent.document.querySelector('input[data-testid="stTextInput"]');
-            if (streamlitInput) {
-                streamlitInput.value = selectedText;
-                streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }
+            fetch('/_stcore_/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({selected_text: selectedText})
+            });
         }
-    }
-    document.addEventListener("mouseup", sendSelectionToStreamlit);
+    });
 </script>
 """
 
 components.html(custom_js, height=0)
 
-# ---- Espacio donde se guarda la selección de texto ----
-selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected_text")
+# ---- Captura del término seleccionado ----
+if "selected_text" not in st.session_state:
+    st.session_state.selected_text = ""
 
-# ---- Botón para marcar el término ----
+# ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
-    if selected_text and selected_text not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(selected_text)
+    if st.session_state.selected_text and st.session_state.selected_text not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(st.session_state.selected_text)
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
