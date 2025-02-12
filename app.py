@@ -41,8 +41,14 @@ elif st.session_state.app_stage == "nombre":
     st.title("Introduce tu nombre")
     st.session_state.user_name = st.text_input("Nombre:")
 
-    if st.session_state.user_name:
-        if st.button("Siguiente"):
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅ Volver"):
+            st.session_state.app_stage = "inicio"
+            st.rerun()
+    
+    with col2:
+        if st.session_state.user_name and st.button("Siguiente ➡"):
             st.session_state.app_stage = "seleccion"
             st.rerun()
 
@@ -91,8 +97,7 @@ elif st.session_state.app_stage == "seleccion":
     if st.button("Marcar término"):
         if selected_text and selected_text not in st.session_state.selected_terms:
             st.session_state.selected_terms.append(selected_text)
-            st.session_state.current_selection = ""  # Resetear selección
-            st.experimental_rerun()
+            st.success(f"Término '{selected_text}' guardado.")
 
     # ---- Mostrar términos seleccionados ----
     st.write("### Términos seleccionados:")
@@ -102,10 +107,16 @@ elif st.session_state.app_stage == "seleccion":
     else:
         st.warning("No hay términos seleccionados.")
 
-    # ---- Botón para finalizar la selección ----
-    if st.button("Finalizar tarea"):
-        st.session_state.app_stage = "guardar"
-        st.rerun()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅ Volver"):
+            st.session_state.app_stage = "nombre"
+            st.rerun()
+
+    with col2:
+        if st.button("Finalizar tarea ➡"):
+            st.session_state.app_stage = "guardar"
+            st.rerun()
 
 # ---- Pantalla 4: Guardar tarea y despedida ----
 elif st.session_state.app_stage == "guardar":
@@ -145,9 +156,15 @@ elif st.session_state.app_stage == "guardar":
 
     st.write("Cuando termines, envíame el archivo a isabel.moyano@uca.es. ¡Gracias por participar! 😊")
 
-    # ---- Botón para reiniciar la tarea ----
-    if st.button("Volver a la pantalla de inicio"):
-        st.session_state.app_stage = "inicio"
-        st.session_state.selected_terms = []
-        st.session_state.user_name = ""
-        st.rerun()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        if st.button("⬅ Volver"):
+            st.session_state.app_stage = "seleccion"
+            st.rerun()
+    
+    with col2:
+        if st.button("🔄 Reiniciar experimento"):
+            st.session_state.app_stage = "inicio"
+            st.session_state.selected_terms = []
+            st.session_state.user_name = ""
+            st.rerun()
