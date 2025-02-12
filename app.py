@@ -60,10 +60,10 @@ elif st.session_state.app_stage == "seleccion":
         function captureSelection() {
             var selectedText = window.getSelection().toString().trim();
             if (selectedText.length > 0) {
-                const streamlitInput = window.parent.document.querySelector('textarea[data-testid="stTextArea"]');
-                if (streamlitInput) {
-                    streamlitInput.value = selectedText;
-                    streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
+                const inputField = window.parent.document.querySelector('textarea[data-testid="stTextArea"]');
+                if (inputField) {
+                    inputField.value = selectedText;
+                    inputField.dispatchEvent(new Event('input', { bubbles: true }));
                 }
             }
         }
@@ -91,7 +91,8 @@ elif st.session_state.app_stage == "seleccion":
     if st.button("Marcar término"):
         if selected_text and selected_text not in st.session_state.selected_terms:
             st.session_state.selected_terms.append(selected_text)
-            st.success(f"Término '{selected_text}' guardado.")
+            st.session_state.current_selection = ""  # Resetear selección
+            st.experimental_rerun()
 
     # ---- Mostrar términos seleccionados ----
     st.write("### Términos seleccionados:")
