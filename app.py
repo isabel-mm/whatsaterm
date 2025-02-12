@@ -71,9 +71,11 @@ elif st.session_state.app_stage == "seleccion":
         with col2:
             key = f"terms_paragraph_{i}"
             if key not in st.session_state:
-                st.session_state[key] = ""
-            
-            st.session_state[key] = st.text_area("Términos (sepáralos con ENTER)", value=st.session_state[key], key=key, height=100)
+                st.session_state[key] = ""  # Inicializar si no existe
+
+            # Ahora usamos text_area correctamente sin asignación en la misma línea
+            user_input = st.text_area("Términos (sepáralos con ENTER)", value=st.session_state[key], key=key, height=100)
+            st.session_state[key] = user_input  # Guardamos los cambios en session_state
 
     col1, col2 = st.columns([1, 1])
     with col1:
