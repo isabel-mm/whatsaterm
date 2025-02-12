@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
+from streamlit_js_eval import streamlit_js_eval
 
 # ---- Configuración inicial ----
 st.title("Selección de términos en lingüística de corpus")
-st.write("Selecciona términos directamente en el texto y haz clic en 'Marcar término' para guardarlos.")
+st.write("Selecciona términos con el ratón y haz clic en 'Marcar término' para guardarlos.")
 
 # Entrada del nombre del usuario
 user_name = st.text_input("Nombre:")
@@ -16,34 +16,25 @@ texto = """La lingüística de corpus es una metodología que emplea corpus elec
 if "selected_terms" not in st.session_state:
     st.session_state.selected_terms = []
 
-# ---- JavaScript para capturar la selección de texto y enviarla a Streamlit ----
-custom_js = """
-<script>
-    function sendSelectionToStreamlit() {
-        var selectedText = window.getSelection().toString().trim();
-        if (selectedText.length > 0) {
-            const streamlitInput = window.parent.document.getElementById("streamlit-text-input");
-            if (streamlitInput) {
-                streamlitInput.value = selectedText;
-                streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-        }
-    }
-    document.addEventListener("mouseup", sendSelectionToStreamlit);
-</script>
-"""
-
-components.html(custom_js, height=0)
-
 # ---- Mostrar el texto en pantalla ----
 st.write("### Texto:")
 st.markdown(
-    f"<div id='text-block' style='border:1px solid gray; padding:10px;'>{texto}</div>",
+    f"""
+    <div id='text-block' style='border:1px solid gray; padding:10px;'>
+        {texto}
+    </div>
+    """,
     unsafe_allow_html=True,
 )
 
-# ---- Captura del término seleccionado ----
-selected_text = st.text_input("Texto seleccionado automáticamente:", key="streamlit-text-input")
+# ---- Captura automática de la selección del usuario ----
+selected_text = streamlit_js_eval(
+    js_expressions="window.getSelection().toString()",
+    key="selected_text_capture"
+)
+
+# ---- Mostrar la selección en la interfaz ----
+st.write(f"**Texto seleccionado:** {selected_text if selected_text else '(Selecciona un término)'}")
 
 # ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
