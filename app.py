@@ -71,17 +71,17 @@ texto = [
 
 # ---- Pantalla 1: Introducción ----
 if st.session_state.app_stage == "inicio":
-    st.title("👋 ¡Bienvenid@ al experimento!")
+    st.title("👋 ¡Hola, bienvenid@ al experimento!")
     st.markdown(
         """
         🧑‍💻 **Objetivo del experimento**  
-        Queremos estudiar cómo identificas términos clave en textos de lingüística de corpus.
+        En este experimento tienes que marcar los términos relacionados con la **lingüística de corpus**.
 
         📝 **Instrucciones:**  
         1️⃣ Introduce tu nombre en la siguiente pantalla.  
-        2️⃣ Lee cada párrafo del texto (columna izquierda).  
-        3️⃣ Escribe los **términos clave** que identifiques en la **columna derecha**, **uno por línea (ENTER)**.  
-        4️⃣ Al finalizar, guarda y envía tus resultados.
+        2️⃣ Se te presentará el texto segmentado en párrafos.
+        3️⃣ De manera intuitiva, anota en la columna derecha los **términos clave** que identifiques. Sepáralos con salto de línea (**enter**)
+        4️⃣ Al finalizar, guarda los términos y descarga el archivo .CSV.
 
         💡 ¡Gracias por tu participación!
         """, unsafe_allow_html=True)
