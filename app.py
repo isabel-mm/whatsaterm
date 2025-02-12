@@ -9,20 +9,25 @@ st.write("Por favor, introduce tu nombre y selecciona términos en el texto.")
 # Entrada del nombre del usuario
 user_name = st.text_input("Nombre:")
 
-# Texto de ejemplo
+# ---- Texto de ejemplo ----
 texto = """La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales. Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas."""
+
+st.write("**Texto:**")
+st.markdown(f"<div id='texto'>{texto}</div>", unsafe_allow_html=True)
 
 # ---- JavaScript para capturar la selección de texto ----
 custom_js = """
 <script>
-    function getSelectedText() {
-        var text = window.getSelection().toString().trim();
-        if (text.length > 0) {
-            var iframe = parent.document.querySelector('iframe');
-            iframe.contentWindow.postMessage(text, '*');
+    document.addEventListener("mouseup", function() {
+        var selectedText = window.getSelection().toString().trim();
+        if (selectedText.length > 0) {
+            var streamlitInput = window.parent.document.querySelector('input[data-testid="stTextInput"]');
+            if (streamlitInput) {
+                streamlitInput.value = selectedText;
+                streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
         }
-    }
-    document.addEventListener("mouseup", getSelectedText);
+    });
 </script>
 """
 
@@ -39,7 +44,6 @@ selected_text = st.text_input("Texto seleccionado automáticamente:", key="selec
 if st.button("Marcar término"):
     if selected_text and selected_text not in st.session_state.selected_terms:
         st.session_state.selected_terms.append(selected_text)
-        st.experimental_rerun()  # Recargar la página para reflejar cambios
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
