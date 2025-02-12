@@ -11,6 +11,11 @@ st.markdown("""
             color: #333;
         }
         
+        /* Justificar texto */
+        .stMarkdown p, .stText p {
+            text-align: justify;
+        }
+
         /* Personalizar los títulos */
         .stTitle {
             color: #1f77b4;
@@ -36,11 +41,6 @@ st.markdown("""
             border-radius: 10px;
             border: 1px solid #ccc;
             padding: 8px;
-        }
-        
-        /* Centrar elementos */
-        .stMarkdown {
-            text-align: center;
         }
 
         /* Espaciado entre secciones */
@@ -72,7 +72,7 @@ texto = [
 # ---- Pantalla 1: Introducción ----
 if st.session_state.app_stage == "inicio":
     st.title("👋 ¡Bienvenid@ al experimento!")
-    st.write(
+    st.markdown(
         """
         🧑‍💻 **Objetivo del experimento**  
         Queremos estudiar cómo identificas términos clave en textos de lingüística de corpus.
@@ -84,8 +84,7 @@ if st.session_state.app_stage == "inicio":
         4️⃣ Al finalizar, guarda y envía tus resultados.
 
         💡 ¡Gracias por tu participación!
-        """
-    )
+        """, unsafe_allow_html=True)
 
     if st.button("🚀 Comenzar"):
         st.session_state.app_stage = "nombre"
@@ -113,7 +112,7 @@ elif st.session_state.app_stage == "nombre":
 # ---- Pantalla 3: Selección de términos por párrafo ----
 elif st.session_state.app_stage == "seleccion":
     st.title("📝 Selección de términos")
-    st.write("🔎 **Lee cada párrafo y escribe los términos clave en la caja de la derecha, uno por línea (ENTER).**")
+    st.markdown("🔎 **Lee cada párrafo y escribe los términos clave en la caja de la derecha, uno por línea (ENTER).**", unsafe_allow_html=True)
 
     for i, parrafo in enumerate(texto):
         key = f"terms_paragraph_{i}"
@@ -122,9 +121,9 @@ elif st.session_state.app_stage == "seleccion":
 
         col1, col2 = st.columns([2, 3])  # Más espacio para la columna de términos
         with col1:
-            st.markdown(f"### 📌 Párrafo {i+1}")
-            st.write(parrafo)
-        
+            st.markdown(f"### 📌 Párrafo {i+1}", unsafe_allow_html=True)
+            st.markdown(f"<p>{parrafo}</p>", unsafe_allow_html=True)  # Justificado
+
         with col2:
             # Ahora usamos text_area sin modificar `st.session_state` directamente
             st.text_area("Términos (sepáralos con ENTER)", key=key, height=100)
@@ -148,13 +147,13 @@ elif st.session_state.app_stage == "seleccion":
 # ---- Pantalla 4: Guardar tarea y despedida ----
 elif st.session_state.app_stage == "guardar":
     st.title("🎉 ¡Gracias por participar!")
-    st.write(
+    st.markdown(
         f"""
         🙌 **{st.session_state.user_name}, has completado la tarea.**  
 
         ✅ Tus términos seleccionados están listos para ser guardados.  
         📩 **Paso final:** Descarga el archivo y envíamelo a **isabel.moyano@uca.es**.
-        """
+        """, unsafe_allow_html=True
     )
 
     # ---- Formatear términos correctamente antes de exportar ----
@@ -178,7 +177,7 @@ elif st.session_state.app_stage == "guardar":
                 mime="text/csv",
             )
 
-    st.write("📩 **Cuando termines, envíame el archivo a isabel.moyano@uca.es.** ¡Gracias por participar! 😊")
+    st.markdown("📩 **Cuando termines, envíame el archivo a isabel.moyano@uca.es.** ¡Gracias por participar! 😊", unsafe_allow_html=True)
 
     col1, col2 = st.columns([1, 1])
     with col1:
