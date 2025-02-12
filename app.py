@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from streamlit_js_eval import streamlit_js_eval
+import streamlit.components.v1 as components
 
 # ---- Configuración inicial ----
 st.title("Selección de términos en lingüística de corpus")
@@ -30,17 +30,32 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---- Capturar la selección automáticamente ----
-selected_text = streamlit_js_eval(
-    js_expressions="window.getSelection().toString()",
-    key="selected_text_capture"
-)
+# ---- JavaScript para capturar la selección de texto ----
+custom_js = """
+<script>
+    document.addEventListener("mouseup", function() {
+        var selectedText = window.getSelection().toString().trim();
+        if (selectedText.length > 0) {
+            var streamlitInput = window.parent.document.getElementById("selected-text-input");
+            if (streamlitInput) {
+                streamlitInput.value = selectedText;
+                streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+    });
+</script>
+"""
 
-# ---- Actualizar el estado de sesión con la selección ----
+components.html(custom_js, height=0)
+
+# ---- Campo oculto para almacenar el texto seleccionado ----
+selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected-text-input")
+
+# ---- Actualizar la selección en el estado de sesión ----
 if selected_text:
     st.session_state.current_selection = selected_text
 
-# ---- Mostrar la selección en la interfaz ----
+# ---- Mostrar el término seleccionado antes de guardarlo ----
 st.write(f"**Texto seleccionado:** {st.session_state.current_selection if st.session_state.current_selection else '(Selecciona un término)'}")
 
 # ---- Botón para marcar el término seleccionado ----
