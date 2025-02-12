@@ -28,8 +28,8 @@ if st.session_state.app_stage == "inicio":
         
         **Instrucciones**:
         1. Introduce tu nombre en la siguiente pantalla.
-        2. Lee cada párrafo del texto.
-        3. Escribe en la caja de la derecha los términos clave que identifiques.
+        2. Lee cada párrafo del texto (izquierda).
+        3. Escribe en la columna de la derecha los términos clave que identifiques, **uno por línea (ENTER)**.
         4. Cuando termines, guarda tus resultados y envíalos.
 
         ¡Haz clic en "Siguiente" para continuar!
@@ -59,17 +59,20 @@ elif st.session_state.app_stage == "nombre":
 # ---- Pantalla 3: Selección de términos por párrafo ----
 elif st.session_state.app_stage == "seleccion":
     st.title("Selección de términos")
-    st.write("Lee cada párrafo y escribe los términos clave en la caja de texto correspondiente.")
+    st.write("Lee cada párrafo y escribe los términos clave en la caja de la derecha, **uno por línea (ENTER)**.")
 
     for i, parrafo in enumerate(texto):
-        st.markdown(f"### Párrafo {i+1}")
-        st.write(parrafo)
+        col1, col2 = st.columns([2, 3])  # Más espacio para la columna de términos
+        with col1:
+            st.markdown(f"### Párrafo {i+1}")
+            st.write(parrafo)
         
-        key = f"terms_paragraph_{i}"
-        if key not in st.session_state:
-            st.session_state[key] = ""
-        
-        st.text_area("Escribe los términos clave:", key=key)
+        with col2:
+            key = f"terms_paragraph_{i}"
+            if key not in st.session_state:
+                st.session_state[key] = ""
+            
+            st.text_area("Términos clave (uno por línea):", key=key, height=100)
 
     col1, col2 = st.columns([1, 1])
     with col1:
