@@ -16,6 +16,9 @@ texto = """La lingüística de corpus es una metodología que emplea corpus elec
 if "selected_terms" not in st.session_state:
     st.session_state.selected_terms = []
 
+if "current_selection" not in st.session_state:
+    st.session_state.current_selection = ""
+
 # ---- Mostrar el texto en pantalla ----
 st.write("### Texto:")
 st.markdown(
@@ -27,19 +30,25 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---- Captura automática de la selección del usuario ----
+# ---- Capturar la selección automáticamente ----
 selected_text = streamlit_js_eval(
     js_expressions="window.getSelection().toString()",
     key="selected_text_capture"
 )
 
+# ---- Actualizar el estado de sesión con la selección ----
+if selected_text:
+    st.session_state.current_selection = selected_text
+
 # ---- Mostrar la selección en la interfaz ----
-st.write(f"**Texto seleccionado:** {selected_text if selected_text else '(Selecciona un término)'}")
+st.write(f"**Texto seleccionado:** {st.session_state.current_selection if st.session_state.current_selection else '(Selecciona un término)'}")
 
 # ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
-    if selected_text and selected_text not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(selected_text)
+    if st.session_state.current_selection and st.session_state.current_selection not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(st.session_state.current_selection)
+        st.success(f"Término '{st.session_state.current_selection}' guardado.")
+        st.session_state.current_selection = ""  # Resetear la selección
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
