@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
+from streamlit_js_eval import streamlit_js_eval
 
 # ---- Configuración inicial ----
 st.title("Selección de términos en lingüística de corpus")
 st.write("Selecciona términos con el ratón y haz clic en 'Marcar término' para guardarlos.")
 
-# Entrada del nombre del usuario
+# ---- Entrada del nombre del usuario ----
 user_name = st.text_input("Nombre:")
 
 # ---- Texto de ejemplo ----
@@ -19,24 +19,8 @@ if "selected_terms" not in st.session_state:
 if "current_selection" not in st.session_state:
     st.session_state.current_selection = ""
 
-# ---- JavaScript para capturar la selección de texto y enviarla a Streamlit ----
-selection_js = """
-<script>
-    function captureSelection() {
-        var selectedText = window.getSelection().toString().trim();
-        if (selectedText.length > 0) {
-            fetch("/_stcore_/update", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ "selected_text": selectedText })
-            });
-        }
-    }
-    document.addEventListener("mouseup", captureSelection);
-</script>
-"""
-
 # ---- Mostrar el texto en pantalla ----
+st.write("### Texto:")
 st.markdown(
     f"""
     <div id='text-block' style='border:1px solid gray; padding:10px; cursor:text;'>
@@ -46,18 +30,20 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-components.html(selection_js, height=0)
+# ---- Capturar la selección automáticamente con streamlit_js_eval ----
+selected_text = streamlit_js_eval(js_expressions="window.getSelection().toString()", key="text_selection")
 
-# ---- Input oculto para capturar la selección ----
-selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected-text-input")
+# ---- Mostrar el término seleccionado ----
+if selected_text:
+    st.session_state.current_selection = selected_text  # Guardar selección en session_state
+
+st.write(f"**Texto seleccionado:** {st.session_state.current_selection if st.session_state.current_selection else '(Selecciona un término)'}")
 
 # ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
-    if selected_text and selected_text not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(selected_text)
-        st.success(f"Término '{selected_text}' guardado.")
-        # Forzar la actualización del input oculto
-        st.session_state["selected-text-input"] = ""
+    if st.session_state.current_selection and st.session_state.current_selection not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(st.session_state.current_selection)
+        st.session_state.current_selection = ""  # Resetear selección
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
