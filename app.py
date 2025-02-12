@@ -44,7 +44,10 @@ if st.session_state.app_stage == "inicio":
 # ---- Pantalla 2: Introducir Nombre ----
 elif st.session_state.app_stage == "nombre":
     st.title("✍ Introduce tu nombre")
-    st.session_state.user_name = st.text_input("Nombre:")
+    user_input_name = st.text_input("Nombre:", value=st.session_state.user_name)
+
+    if user_input_name:
+        st.session_state.user_name = user_input_name  # Guardamos el nombre en session_state
 
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -63,19 +66,18 @@ elif st.session_state.app_stage == "seleccion":
     st.write("🔎 **Lee cada párrafo y escribe los términos clave en la caja de la derecha, uno por línea (ENTER).**")
 
     for i, parrafo in enumerate(texto):
+        key = f"terms_paragraph_{i}"
+        if key not in st.session_state:
+            st.session_state[key] = ""
+
         col1, col2 = st.columns([2, 3])  # Más espacio para la columna de términos
         with col1:
             st.markdown(f"### 📌 Párrafo {i+1}")
             st.write(parrafo)
         
         with col2:
-            key = f"terms_paragraph_{i}"
-            if key not in st.session_state:
-                st.session_state[key] = ""  # Inicializar si no existe
-
-            # Ahora usamos text_area correctamente sin asignación en la misma línea
-            user_input = st.text_area("Términos (sepáralos con ENTER)", value=st.session_state[key], key=key, height=100)
-            st.session_state[key] = user_input  # Guardamos los cambios en session_state
+            # Ahora usamos text_area sin modificar `st.session_state` directamente
+            st.text_area("Términos (sepáralos con ENTER)", key=key, height=100)
 
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -85,13 +87,11 @@ elif st.session_state.app_stage == "seleccion":
 
     with col2:
         if st.button("✅ Finalizar tarea"):
-            # Guardar términos en session_state.selected_terms antes de continuar
-            st.session_state.selected_terms = {}
-            for i in range(len(texto)):
-                key = f"terms_paragraph_{i}"
-                if st.session_state[key]:  # Solo guardar si hay términos
-                    st.session_state.selected_terms[f"Párrafo {i+1}"] = st.session_state[key]
-            
+            # Guardamos los términos en selected_terms ANTES de cambiar de pantalla
+            st.session_state.selected_terms = {
+                f"Párrafo {i+1}": st.session_state[f"terms_paragraph_{i}"]
+                for i in range(len(texto)) if st.session_state[f"terms_paragraph_{i}"]
+            }
             st.session_state.app_stage = "guardar"
             st.rerun()
 
@@ -108,16 +108,10 @@ elif st.session_state.app_stage == "guardar":
     )
 
     # ---- Formatear términos correctamente antes de exportar ----
-    formatted_terms = []
-    for i in range(len(texto)):
-        key = f"Párrafo {i+1}"
-        if key in st.session_state.selected_terms:
-            terms_list = st.session_state.selected_terms[key].split("\n")  # Convertir en lista
-            formatted_terms.append({
-                "Párrafo": key,
-                "Términos": "; ".join(terms_list),  # Unir términos con "; "
-                "Usuario": st.session_state.user_name
-            })
+    formatted_terms = [
+        {"Párrafo": key, "Términos": "; ".join(value.split("\n")), "Usuario": st.session_state.user_name}
+        for key, value in st.session_state.selected_terms.items()
+    ]
 
     # ---- Exportar términos a CSV en utf-8 ----
     if st.button("📥 Descargar términos seleccionados"):
