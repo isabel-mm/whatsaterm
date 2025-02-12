@@ -13,10 +13,10 @@ if "user_name" not in st.session_state:
 
 # ---- Texto de ejemplo segmentado ----
 texto = [
-    "📖 La **lingüística de corpus** es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales.",
-    "💡 Se distingue por el uso de herramientas computacionales para identificar **patrones y frecuencias léxicas**.",
-    "🔍 Los corpus permiten realizar **estudios empíricos** en lingüística aplicada, traducción, lexicografía y otros campos.",
-    "📊 A través del análisis de corpus se pueden identificar tendencias en el lenguaje, **neologismos** y usos específicos en diferentes registros."
+    "La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales.",
+    "Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas.",
+    "Los corpus permiten realizar estudios empíricos en lingüística aplicada, traducción, lexicografía y otros campos.",
+    "A través del análisis de corpus se pueden identificar tendencias en el lenguaje, neologismos y usos específicos en diferentes registros."
 ]
 
 # ---- Pantalla 1: Introducción ----
@@ -32,8 +32,6 @@ if st.session_state.app_stage == "inicio":
         2️⃣ Lee cada párrafo del texto (columna izquierda).  
         3️⃣ Escribe los **términos clave** que identifiques en la **columna derecha**, **uno por línea (ENTER)**.  
         4️⃣ Al finalizar, guarda y envía tus resultados.
-
-        🔎 **Consejo:** Un término clave puede ser una palabra o una combinación de palabras que sean importantes en el contexto.
 
         💡 ¡Gracias por tu participación!
         """
