@@ -9,12 +9,31 @@ st.write("Selecciona términos directamente en el texto y haz clic en 'Marcar t�
 # Entrada del nombre del usuario
 user_name = st.text_input("Nombre:")
 
-# ---- Definir el texto a analizar ----
+# ---- Texto de ejemplo ----
 texto = """La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales. Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas."""
 
 # ---- Estado de sesión para almacenar términos seleccionados ----
 if "selected_terms" not in st.session_state:
     st.session_state.selected_terms = []
+
+# ---- JavaScript para capturar la selección de texto y enviarla a Streamlit ----
+custom_js = """
+<script>
+    function sendSelectionToStreamlit() {
+        var selectedText = window.getSelection().toString().trim();
+        if (selectedText.length > 0) {
+            const streamlitInput = window.parent.document.getElementById("streamlit-text-input");
+            if (streamlitInput) {
+                streamlitInput.value = selectedText;
+                streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+    }
+    document.addEventListener("mouseup", sendSelectionToStreamlit);
+</script>
+"""
+
+components.html(custom_js, height=0)
 
 # ---- Mostrar el texto en pantalla ----
 st.write("### Texto:")
@@ -23,38 +42,21 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# ---- JavaScript para capturar automáticamente la selección de texto ----
-custom_js = """
-<script>
-    document.addEventListener("mouseup", function() {
-        var selectedText = window.getSelection().toString().trim();
-        if (selectedText.length > 0) {
-            fetch('/_stcore_/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({selected_text: selectedText})
-            });
-        }
-    });
-</script>
-"""
-
-components.html(custom_js, height=0)
-
 # ---- Captura del término seleccionado ----
-if "selected_text" not in st.session_state:
-    st.session_state.selected_text = ""
+selected_text = st.text_input("Texto seleccionado automáticamente:", key="streamlit-text-input")
 
 # ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
-    if st.session_state.selected_text and st.session_state.selected_text not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(st.session_state.selected_text)
+    if selected_text and selected_text not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(selected_text)
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
 if st.session_state.selected_terms:
     for term in st.session_state.selected_terms:
         st.write(f"- {term}")
+else:
+    st.warning("No hay términos seleccionados.")
 
 # ---- Notas del usuario ----
 user_notes = st.text_area("Notas u observaciones:")
