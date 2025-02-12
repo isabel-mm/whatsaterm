@@ -19,7 +19,7 @@ if "selected_terms" not in st.session_state:
 if "current_selection" not in st.session_state:
     st.session_state.current_selection = ""
 
-# ---- HTML + JavaScript para capturar la selección de texto ----
+# ---- JavaScript para capturar la selección de texto ----
 selection_js = """
 <script>
     function captureSelection() {
@@ -49,14 +49,19 @@ components.html(selection_js, height=0)
 # ---- Captura la selección en un input oculto ----
 selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected-text-input")
 
+# ---- Actualizar la selección en el estado de sesión ----
+if selected_text:
+    st.session_state.current_selection = selected_text
+
 # ---- Mostrar la selección en la interfaz ----
-st.write(f"**Texto seleccionado:** {selected_text if selected_text else '(Selecciona un término)'}")
+st.write(f"**Texto seleccionado:** {st.session_state.current_selection if st.session_state.current_selection else '(Selecciona un término)'}")
 
 # ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
-    if selected_text and selected_text not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(selected_text)
-        st.success(f"Término '{selected_text}' guardado.")
+    if st.session_state.current_selection and st.session_state.current_selection not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(st.session_state.current_selection)
+        st.session_state.current_selection = ""  # Resetear la selección
+        st.experimental_rerun()  # <--- ¡ESTO HACE QUE LA INTERFAZ SE ACTUALICE!
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
