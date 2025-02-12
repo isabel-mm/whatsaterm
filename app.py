@@ -19,49 +19,45 @@ if "selected_terms" not in st.session_state:
 if "current_selection" not in st.session_state:
     st.session_state.current_selection = ""
 
-# ---- JavaScript para capturar la selección de texto ----
+# ---- JavaScript para capturar la selección de texto y enviarla a Streamlit ----
 selection_js = """
 <script>
     function captureSelection() {
         var selectedText = window.getSelection().toString().trim();
         if (selectedText.length > 0) {
-            var streamlitInput = window.parent.document.getElementById("selected-text-input");
-            if (streamlitInput) {
-                streamlitInput.value = selectedText;
-                streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }
+            fetch("/_stcore_/update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ "selected_text": selectedText })
+            });
         }
     }
     document.addEventListener("mouseup", captureSelection);
 </script>
 """
 
-# ---- Mostrar el texto en pantalla con JavaScript integrado ----
+# ---- Mostrar el texto en pantalla ----
 st.markdown(
     f"""
-    <div id='text-block' style='border:1px solid gray; padding:10px; cursor:text;'>{texto}</div>
+    <div id='text-block' style='border:1px solid gray; padding:10px; cursor:text;'>
+        {texto}
+    </div>
     """,
     unsafe_allow_html=True,
 )
 
 components.html(selection_js, height=0)
 
-# ---- Captura la selección en un input oculto ----
+# ---- Input oculto para capturar la selección ----
 selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected-text-input")
-
-# ---- Actualizar la selección en el estado de sesión ----
-if selected_text:
-    st.session_state.current_selection = selected_text
-
-# ---- Mostrar la selección en la interfaz ----
-st.write(f"**Texto seleccionado:** {st.session_state.current_selection if st.session_state.current_selection else '(Selecciona un término)'}")
 
 # ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
-    if st.session_state.current_selection and st.session_state.current_selection not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(st.session_state.current_selection)
-        st.session_state.current_selection = ""  # Resetear la selección
-        st.experimental_rerun()  # <--- ¡ESTO HACE QUE LA INTERFAZ SE ACTUALICE!
+    if selected_text and selected_text not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(selected_text)
+        st.success(f"Término '{selected_text}' guardado.")
+        # Forzar la actualización del input oculto
+        st.session_state["selected-text-input"] = ""
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
