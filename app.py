@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from streamlit_js_eval import streamlit_js_eval
+import streamlit.components.v1 as components
 
 # ---- Configuración inicial ----
 st.title("Selección de términos en lingüística de corpus")
@@ -19,31 +19,44 @@ if "selected_terms" not in st.session_state:
 if "current_selection" not in st.session_state:
     st.session_state.current_selection = ""
 
+# ---- JavaScript para capturar la selección de texto y enviarla a Streamlit ----
+selection_js = """
+<script>
+    function captureSelection() {
+        var selectedText = window.getSelection().toString().trim();
+        if (selectedText.length > 0) {
+            const streamlitInput = window.parent.document.querySelector('textarea[data-testid="stTextArea"]');
+            if (streamlitInput) {
+                streamlitInput.value = selectedText;
+                streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+    }
+    document.addEventListener("mouseup", captureSelection);
+</script>
+"""
+
 # ---- Mostrar el texto en pantalla ----
-st.write("### Texto:")
 st.markdown(
     f"""
-    <div id='text-block' style='border:1px solid gray; padding:10px; cursor:text;'>
-        {texto}
-    </div>
+    <div id='text-block' style='border:1px solid gray; padding:10px; cursor:text;'>{texto}</div>
     """,
     unsafe_allow_html=True,
 )
 
-# ---- Capturar la selección automáticamente con streamlit_js_eval ----
-selected_text = streamlit_js_eval(js_expressions="window.getSelection().toString()", key="text_selection")
+components.html(selection_js, height=0)
+
+# ---- Captura la selección en un campo oculto ----
+selected_text = st.text_area("Texto seleccionado automáticamente:", key="selected-text-input")
 
 # ---- Mostrar el término seleccionado ----
-if selected_text:
-    st.session_state.current_selection = selected_text  # Guardar selección en session_state
-
-st.write(f"**Texto seleccionado:** {st.session_state.current_selection if st.session_state.current_selection else '(Selecciona un término)'}")
+st.write(f"**Texto seleccionado:** {selected_text if selected_text else '(Selecciona un término)'}")
 
 # ---- Botón para marcar el término seleccionado ----
 if st.button("Marcar término"):
-    if st.session_state.current_selection and st.session_state.current_selection not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(st.session_state.current_selection)
-        st.session_state.current_selection = ""  # Resetear selección
+    if selected_text and selected_text not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(selected_text)
+        st.success(f"Término '{selected_text}' guardado.")
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
