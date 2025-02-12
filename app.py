@@ -13,12 +13,12 @@ user_name = st.text_input("Nombre:")
 texto = """La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales. Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas."""
 
 # ---- JavaScript para capturar la selección de texto ----
-custom_html = """
+custom_js = """
 <script>
     function getSelectedText() {
-        var text = window.getSelection().toString();
+        var text = window.getSelection().toString().trim();
         if (text.length > 0) {
-            var iframe = parent.document.querySelector('iframe'); 
+            var iframe = parent.document.querySelector('iframe');
             iframe.contentWindow.postMessage(text, '*');
         }
     }
@@ -26,22 +26,26 @@ custom_html = """
 </script>
 """
 
-components.html(custom_html, height=0)
+components.html(custom_js, height=0)
 
 # ---- Captura la selección usando Streamlit session state ----
 if "selected_terms" not in st.session_state:
     st.session_state.selected_terms = []
 
-# ---- Función para agregar términos seleccionados ----
-selected_text = st.text_input("Selecciona un término y cópialo aquí:", "")
+# ---- Espacio para recibir el término seleccionado ----
+selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected_text")
 
-if st.button("Añadir término"):
+# ---- Función para agregar términos seleccionados ----
+if st.button("Marcar término"):
     if selected_text and selected_text not in st.session_state.selected_terms:
         st.session_state.selected_terms.append(selected_text)
+        st.experimental_rerun()  # Recargar la página para reflejar cambios
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
-st.write(st.session_state.selected_terms)
+if st.session_state.selected_terms:
+    for term in st.session_state.selected_terms:
+        st.write(f"- {term}")
 
 # ---- Notas del usuario ----
 user_notes = st.text_area("Notas u observaciones:")
