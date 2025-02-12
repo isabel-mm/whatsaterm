@@ -73,7 +73,7 @@ elif st.session_state.app_stage == "seleccion":
             if key not in st.session_state:
                 st.session_state[key] = ""
             
-            st.text_area("Términos (sepáralos con ENTER)", key=key, height=100)
+            st.text_area("✏ Términos clave (uno por línea):", key=key, height=100)
 
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -110,13 +110,13 @@ elif st.session_state.app_stage == "guardar":
                 "Usuario": st.session_state.user_name
             })
 
-    # ---- Exportar términos a CSV en utf-8 ----
+    # ---- Exportar términos a CSV ----
     if st.button("📥 Descargar términos seleccionados"):
         if not formatted_terms:
             st.error("⚠ No hay términos seleccionados.")
         else:
             df = pd.DataFrame(formatted_terms)
-            csv = df.to_csv(index=False, encoding="utf-8").encode("utf-8")  # Manteniendo utf-8
+            csv = df.to_csv(index=False, encoding="utf-8-sig").encode("utf-8-sig")  # 💡 Solucionamos el problema de codificación
 
             st.download_button(
                 label="📥 Descargar archivo CSV",
