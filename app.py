@@ -1,6 +1,56 @@
 import streamlit as st
 import pandas as pd
 
+# ---- CSS Personalizado ----
+st.markdown("""
+    <style>
+        /* Cambiar la fuente y hacer el diseño más limpio */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+        }
+        
+        /* Personalizar los títulos */
+        .stTitle {
+            color: #1f77b4;
+            font-weight: bold;
+        }
+        
+        /* Mejorar los botones */
+        div.stButton > button {
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        
+        div.stButton > button:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Modificar cajas de texto */
+        .stTextArea, .stTextInput {
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        
+        /* Centrar elementos */
+        .stMarkdown {
+            text-align: center;
+        }
+
+        /* Espaciado entre secciones */
+        .block-container {
+            padding-top: 30px;
+        }
+
+    </style>
+""", unsafe_allow_html=True)
+
 # ---- Configuración del estado de sesión ----
 if "app_stage" not in st.session_state:
     st.session_state.app_stage = "inicio"
@@ -119,7 +169,7 @@ elif st.session_state.app_stage == "guardar":
             st.error("⚠ No hay términos seleccionados.")
         else:
             df = pd.DataFrame(formatted_terms)
-            csv = df.to_csv(index=False, encoding="utf-8").encode("utf-8")  # Manteniendo utf-8
+            csv = df.to_csv(index=False, encoding="utf-8").encode("utf-8")
 
             st.download_button(
                 label="📥 Descargar archivo CSV",
