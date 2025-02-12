@@ -73,7 +73,7 @@ elif st.session_state.app_stage == "seleccion":
             if key not in st.session_state:
                 st.session_state[key] = ""
             
-            st.text_area("✏ Términos clave (uno por línea):", key=key, height=100)
+            st.text_area("Términos (sepáralos con ENTER)", key=key, height=100)
 
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -98,24 +98,25 @@ elif st.session_state.app_stage == "guardar":
         """
     )
 
-    # Guardar términos ingresados
+    # ---- Formatear términos correctamente antes de exportar ----
+    formatted_terms = []
     for i in range(len(texto)):
         key = f"terms_paragraph_{i}"
         if key in st.session_state and st.session_state[key]:
-            st.session_state.selected_terms[f"Párrafo {i+1}"] = st.session_state[key]
+            terms_list = st.session_state[key].split("\n")  # Convertir en lista
+            formatted_terms.append({
+                "Párrafo": f"Párrafo {i+1}",
+                "Términos": "; ".join(terms_list),  # Unir términos con "; "
+                "Usuario": st.session_state.user_name
+            })
 
-    # ---- Exportar términos a CSV ----
+    # ---- Exportar términos a CSV en utf-8 ----
     if st.button("📥 Descargar términos seleccionados"):
-        if not st.session_state.selected_terms:
+        if not formatted_terms:
             st.error("⚠ No hay términos seleccionados.")
         else:
-            data = {
-                "Párrafo": list(st.session_state.selected_terms.keys()),
-                "Términos": list(st.session_state.selected_terms.values()),
-                "Usuario": [st.session_state.user_name] * len(st.session_state.selected_terms),
-            }
-            df = pd.DataFrame(data)
-            csv = df.to_csv(index=False).encode("utf-8")
+            df = pd.DataFrame(formatted_terms)
+            csv = df.to_csv(index=False, encoding="utf-8").encode("utf-8")  # Manteniendo utf-8
 
             st.download_button(
                 label="📥 Descargar archivo CSV",
