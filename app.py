@@ -72,23 +72,24 @@ texto = [
 # ---- Pantalla 1: Introducción ----
 if st.session_state.app_stage == "inicio":
     st.title("👋 ¡Hola, bienvenid@ al experimento!")
+    
     st.markdown(
-        """
-        🧑‍💻 **Objetivo del experimento**  
-        En este experimento tienes que marcar los términos relacionados con la **lingüística de corpus**.
-
-        📝 **Instrucciones:**  
-        1️⃣ Introduce tu nombre en la siguiente pantalla.  
-        2️⃣ Se te presentará el texto segmentado en párrafos.
-        3️⃣ De manera intuitiva, anota en la columna derecha los **términos clave** que identifiques. Sepáralos con salto de línea (**enter**)
-        4️⃣ Al finalizar, guarda los términos y descarga el archivo .CSV.
-
-        💡 ¡Gracias por tu participación!
-        """, unsafe_allow_html=True)
+        "🧑‍💻 **Objetivo del experimento**  \n"
+        "En este experimento tienes que marcar los términos relacionados con la **lingüística de corpus**.  \n\n"
+        "📝 **Instrucciones:**  \n\n"
+        "1️⃣ **Introduce tu nombre en la siguiente pantalla.**  \n\n"
+        "2️⃣ **Se te presentará el texto segmentado en párrafos.**  \n\n"
+        "3️⃣ **De manera intuitiva, anota en la columna derecha los términos clave que identifiques.**  \n"
+        "   💡 **Sepáralos con salto de línea (ENTER).**  \n\n"
+        "4️⃣ **Al finalizar, guarda los términos y descarga el archivo `.CSV`.**  \n\n"
+        "💡 ¡Gracias por tu participación!", 
+        unsafe_allow_html=True
+    )
 
     if st.button("🚀 Comenzar"):
         st.session_state.app_stage = "nombre"
         st.rerun()
+
 
 # ---- Pantalla 2: Introducir Nombre ----
 elif st.session_state.app_stage == "nombre":
