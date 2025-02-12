@@ -73,7 +73,7 @@ elif st.session_state.app_stage == "seleccion":
             if key not in st.session_state:
                 st.session_state[key] = ""
             
-            st.text_area("✏ Términos clave (uno por línea):", key=key, height=100)
+            st.session_state[key] = st.text_area("Términos (sepáralos con ENTER)", value=st.session_state[key], key=key, height=100)
 
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -83,6 +83,13 @@ elif st.session_state.app_stage == "seleccion":
 
     with col2:
         if st.button("✅ Finalizar tarea"):
+            # Guardar términos en session_state.selected_terms antes de continuar
+            st.session_state.selected_terms = {}
+            for i in range(len(texto)):
+                key = f"terms_paragraph_{i}"
+                if st.session_state[key]:  # Solo guardar si hay términos
+                    st.session_state.selected_terms[f"Párrafo {i+1}"] = st.session_state[key]
+            
             st.session_state.app_stage = "guardar"
             st.rerun()
 
@@ -101,22 +108,22 @@ elif st.session_state.app_stage == "guardar":
     # ---- Formatear términos correctamente antes de exportar ----
     formatted_terms = []
     for i in range(len(texto)):
-        key = f"terms_paragraph_{i}"
-        if key in st.session_state and st.session_state[key]:
-            terms_list = st.session_state[key].split("\n")  # Convertir en lista
+        key = f"Párrafo {i+1}"
+        if key in st.session_state.selected_terms:
+            terms_list = st.session_state.selected_terms[key].split("\n")  # Convertir en lista
             formatted_terms.append({
-                "Párrafo": f"Párrafo {i+1}",
+                "Párrafo": key,
                 "Términos": "; ".join(terms_list),  # Unir términos con "; "
                 "Usuario": st.session_state.user_name
             })
 
-    # ---- Exportar términos a CSV ----
+    # ---- Exportar términos a CSV en utf-8 ----
     if st.button("📥 Descargar términos seleccionados"):
         if not formatted_terms:
             st.error("⚠ No hay términos seleccionados.")
         else:
             df = pd.DataFrame(formatted_terms)
-            csv = df.to_csv(index=False, encoding="utf-8-sig").encode("utf-8-sig")  # 💡 Solucionamos el problema de codificación
+            csv = df.to_csv(index=False, encoding="utf-8").encode("utf-8")  # Manteniendo utf-8
 
             st.download_button(
                 label="📥 Descargar archivo CSV",
