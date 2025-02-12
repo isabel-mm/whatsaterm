@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 
 # ---- Configuración inicial ----
 st.title("Selección de términos en lingüística de corpus")
-st.write("Selecciona términos directamente en el texto para marcarlos.")
+st.write("Selecciona términos directamente en el texto y haz clic en 'Marcar término' para guardarlos.")
 
 # Entrada del nombre del usuario
 user_name = st.text_input("Nombre:")
@@ -16,10 +16,14 @@ texto = """La lingüística de corpus es una metodología que emplea corpus elec
 if "selected_terms" not in st.session_state:
     st.session_state.selected_terms = []
 
-# ---- JavaScript para capturar automáticamente la selección de texto ----
+# ---- Mostrar el texto en pantalla ----
+st.write("### Texto:")
+st.markdown(f"<div id='texto' style='border:1px solid gray; padding:10px;'>{texto}</div>", unsafe_allow_html=True)
+
+# ---- JavaScript para capturar la selección de texto ----
 custom_js = """
 <script>
-    document.addEventListener("mouseup", function() {
+    function sendSelectionToStreamlit() {
         var selectedText = window.getSelection().toString().trim();
         if (selectedText.length > 0) {
             var streamlitInput = window.parent.document.querySelector('input[data-testid="stTextInput"]');
@@ -28,19 +32,20 @@ custom_js = """
                 streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
         }
-    });
+    }
+    document.addEventListener("mouseup", sendSelectionToStreamlit);
 </script>
 """
 
 components.html(custom_js, height=0)
 
-# ---- Campo oculto donde se recibe la selección ----
+# ---- Espacio donde se guarda la selección de texto ----
 selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected_text")
 
-# ---- Guardar la selección sin hacer clic en ningún botón ----
-if selected_text and selected_text not in st.session_state.selected_terms:
-    st.session_state.selected_terms.append(selected_text)
-    st.experimental_rerun()  # Recargar la página para reflejar los cambios inmediatamente
+# ---- Botón para marcar el término ----
+if st.button("Marcar término"):
+    if selected_text and selected_text not in st.session_state.selected_terms:
+        st.session_state.selected_terms.append(selected_text)
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
