@@ -2,20 +2,21 @@ import streamlit as st
 import pandas as pd
 import streamlit.components.v1 as components
 
-# ---- Interfaz gráfica ----
+# ---- Configuración inicial ----
 st.title("Selección de términos en lingüística de corpus")
-st.write("Por favor, introduce tu nombre y selecciona términos en el texto.")
+st.write("Selecciona términos directamente en el texto para marcarlos.")
 
 # Entrada del nombre del usuario
 user_name = st.text_input("Nombre:")
 
-# ---- Texto de ejemplo ----
+# ---- Definir el texto a analizar ----
 texto = """La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales. Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas."""
 
-st.write("**Texto:**")
-st.markdown(f"<div id='texto'>{texto}</div>", unsafe_allow_html=True)
+# ---- Estado de sesión para almacenar términos seleccionados ----
+if "selected_terms" not in st.session_state:
+    st.session_state.selected_terms = []
 
-# ---- JavaScript para capturar la selección de texto ----
+# ---- JavaScript para capturar automáticamente la selección de texto ----
 custom_js = """
 <script>
     document.addEventListener("mouseup", function() {
@@ -33,17 +34,13 @@ custom_js = """
 
 components.html(custom_js, height=0)
 
-# ---- Captura la selección usando Streamlit session state ----
-if "selected_terms" not in st.session_state:
-    st.session_state.selected_terms = []
-
-# ---- Espacio para recibir el término seleccionado ----
+# ---- Campo oculto donde se recibe la selección ----
 selected_text = st.text_input("Texto seleccionado automáticamente:", key="selected_text")
 
-# ---- Función para agregar términos seleccionados ----
-if st.button("Marcar término"):
-    if selected_text and selected_text not in st.session_state.selected_terms:
-        st.session_state.selected_terms.append(selected_text)
+# ---- Guardar la selección sin hacer clic en ningún botón ----
+if selected_text and selected_text not in st.session_state.selected_terms:
+    st.session_state.selected_terms.append(selected_text)
+    st.experimental_rerun()  # Recargar la página para reflejar los cambios inmediatamente
 
 # ---- Mostrar términos seleccionados ----
 st.write("### Términos seleccionados:")
