@@ -1,19 +1,23 @@
 import streamlit as st
 import pandas as pd
-import streamlit.components.v1 as components
 
 # ---- Manejo del estado de la pantalla ----
 if "app_stage" not in st.session_state:
-    st.session_state.app_stage = "inicio"  # Primera pantalla
+    st.session_state.app_stage = "inicio"
 
 if "selected_terms" not in st.session_state:
-    st.session_state.selected_terms = []
-
-if "current_selection" not in st.session_state:
-    st.session_state.current_selection = ""
+    st.session_state.selected_terms = {}
 
 if "user_name" not in st.session_state:
     st.session_state.user_name = ""
+
+# ---- Texto de ejemplo segmentado ----
+texto = [
+    "La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales.",
+    "Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas.",
+    "Los corpus permiten realizar estudios empíricos en lingüística aplicada, traducción, lexicografía y otros campos.",
+    "A través del análisis de corpus se pueden identificar tendencias en el lenguaje, neologismos y usos específicos en diferentes registros."
+]
 
 # ---- Pantalla 1: Introducción ----
 if st.session_state.app_stage == "inicio":
@@ -24,8 +28,8 @@ if st.session_state.app_stage == "inicio":
         
         **Instrucciones**:
         1. Introduce tu nombre en la siguiente pantalla.
-        2. Lee el texto presentado.
-        3. Selecciona los términos clave con el ratón y márcalos.
+        2. Lee cada párrafo del texto.
+        3. Escribe en la caja de la derecha los términos clave que identifiques.
         4. Cuando termines, guarda tus resultados y envíalos.
 
         ¡Haz clic en "Siguiente" para continuar!
@@ -46,66 +50,26 @@ elif st.session_state.app_stage == "nombre":
         if st.button("⬅ Volver"):
             st.session_state.app_stage = "inicio"
             st.rerun()
-    
+
     with col2:
         if st.session_state.user_name and st.button("Siguiente ➡"):
             st.session_state.app_stage = "seleccion"
             st.rerun()
 
-# ---- Pantalla 3: Selección de términos ----
+# ---- Pantalla 3: Selección de términos por párrafo ----
 elif st.session_state.app_stage == "seleccion":
     st.title("Selección de términos")
-    st.write("Selecciona términos con el ratón y haz clic en 'Marcar término' para guardarlos.")
+    st.write("Lee cada párrafo y escribe los términos clave en la caja de texto correspondiente.")
 
-    # ---- Texto de ejemplo ----
-    texto = """La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales. Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas."""
-
-    # ---- JavaScript para capturar la selección de texto ----
-    selection_js = """
-    <script>
-        function captureSelection() {
-            var selectedText = window.getSelection().toString().trim();
-            if (selectedText.length > 0) {
-                const inputField = window.parent.document.querySelector('textarea[data-testid="stTextArea"]');
-                if (inputField) {
-                    inputField.value = selectedText;
-                    inputField.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-            }
-        }
-        document.addEventListener("mouseup", captureSelection);
-    </script>
-    """
-
-    # ---- Mostrar el texto en pantalla ----
-    st.markdown(
-        f"""
-        <div id='text-block' style='border:1px solid gray; padding:10px; cursor:text;'>{texto}</div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    components.html(selection_js, height=0)
-
-    # ---- Captura la selección en un campo oculto ----
-    selected_text = st.text_area("Texto seleccionado automáticamente:", key="selected-text-input")
-
-    # ---- Mostrar el término seleccionado ----
-    st.write(f"**Texto seleccionado:** {selected_text if selected_text else '(Selecciona un término)'}")
-
-    # ---- Botón para marcar el término seleccionado ----
-    if st.button("Marcar término"):
-        if selected_text and selected_text not in st.session_state.selected_terms:
-            st.session_state.selected_terms.append(selected_text)
-            st.success(f"Término '{selected_text}' guardado.")
-
-    # ---- Mostrar términos seleccionados ----
-    st.write("### Términos seleccionados:")
-    if st.session_state.selected_terms:
-        for term in st.session_state.selected_terms:
-            st.write(f"- {term}")
-    else:
-        st.warning("No hay términos seleccionados.")
+    for i, parrafo in enumerate(texto):
+        st.markdown(f"### Párrafo {i+1}")
+        st.write(parrafo)
+        
+        key = f"terms_paragraph_{i}"
+        if key not in st.session_state:
+            st.session_state[key] = ""
+        
+        st.text_area("Escribe los términos clave:", key=key)
 
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -131,8 +95,11 @@ elif st.session_state.app_stage == "guardar":
         """
     )
 
-    # ---- Notas del usuario ----
-    user_notes = st.text_area("Notas u observaciones:")
+    # Guardar términos ingresados
+    for i in range(len(texto)):
+        key = f"terms_paragraph_{i}"
+        if key in st.session_state and st.session_state[key]:
+            st.session_state.selected_terms[f"Párrafo {i+1}"] = st.session_state[key]
 
     # ---- Exportar términos a CSV ----
     if st.button("Descargar términos seleccionados"):
@@ -140,9 +107,9 @@ elif st.session_state.app_stage == "guardar":
             st.error("⚠ No hay términos seleccionados.")
         else:
             data = {
-                "Término": st.session_state.selected_terms,
+                "Párrafo": list(st.session_state.selected_terms.keys()),
+                "Términos": list(st.session_state.selected_terms.values()),
                 "Usuario": [st.session_state.user_name] * len(st.session_state.selected_terms),
-                "Observaciones": [user_notes] * len(st.session_state.selected_terms),
             }
             df = pd.DataFrame(data)
             csv = df.to_csv(index=False).encode("utf-8")
@@ -165,6 +132,6 @@ elif st.session_state.app_stage == "guardar":
     with col2:
         if st.button("🔄 Reiniciar experimento"):
             st.session_state.app_stage = "inicio"
-            st.session_state.selected_terms = []
+            st.session_state.selected_terms = {}
             st.session_state.user_name = ""
             st.rerun()
