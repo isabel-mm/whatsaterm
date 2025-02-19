@@ -63,10 +63,37 @@ if "user_name" not in st.session_state:
 
 # ---- Texto de ejemplo segmentado ----
 texto = [
-    "La lingüística de corpus es una metodología que emplea corpus electrónicos para analizar fenómenos lingüísticos con base en datos reales.",
-    "Se distingue por el uso de herramientas computacionales para identificar patrones y frecuencias léxicas.",
-    "Los corpus permiten realizar estudios empíricos en lingüística aplicada, traducción, lexicografía y otros campos.",
-    "A través del análisis de corpus se pueden identificar tendencias en el lenguaje, neologismos y usos específicos en diferentes registros."
+    "Corpus linguistics started as an enterprise interested in words, their frequency, and their contexts. Even if a corpus is basic, simply a string of wordforms with no other annotation, it is easy to search for individual words since usually words are a kind of string of characters, separated by white space. There are many corpus studies that compare lexemes, especially near-synonyms and purported synonyms. Corpus searches of words that have similar meanings can show that synonyms can occur in quite different contexts. The differing contexts, then, should be taken into account as part of the definitions of words.",
+    "As discussed in 3.1.1, corpus size is important because we know that in a large sample, we have a better chance of finding what we are looking for, and a better chance of seeing typical patterns of usage. A small sample is more likely to be affected by chance and we may see spurious results. Small samples, unless carefully balanced, will be much more affected by the genre of the source content.",
+    "The multiple annotation schemes of SCOPIC are organised along functional categories. Each language in the study is annotated for expressions that relate to many functional categories relevant to social cognition. Within each broad functional category, researchers code a \"TAG\" and a \"TERM\" for each instance of the phenomenon. A TAG comes from a closed and cross-linguistically fixed list of category choices and indicates the type of expression being used for the relevant instantiation of a particular functional category.",
+    "Correspondence Analysis and Multiple Correspondence Analysis: used for categorical, non-numeric dependent variables, plots dependent variables, as well as independent variables associations measured as chi-square distances.",
+    "Parallel text corpora: texts that are translational equivalents, for example, translations of The Bible text, like the Gospel of Mark.",
+    "Statistical description and analysis. These quantify structural tokens in usage, where statistical universal in traditional typology quantify structural types as part of individual language systems. Classification of a language as \"pro-drop\" in relevant frameworks involves more intricate diagnostics than how frequent zeroes are in discourse.",
+    "Searching for such phenomena requires some string information and some annotation. However, linguists also use corpora to look for phenomena at the constituent level in syntax. This can be difficult because string information is less useful at this level to identify tokens. Take for instance a category like subject or object. These could be any number of different nouns, NPs, or even zeros.",
+    "A famous example of a treebank with constituent structure annotation is the Penn Treebank developed at the University of Pennsylvania, first released in 1992 comprising texts with 2.8 million token words.",
+    "Corpus-based methods have been increasingly employed in contrastive linguistics. The comparison of linguistic structures across languages has benefited from large, systematically compiled corpora.",
+    "Annotation schemes vary depending on the research goals. While some schemes prioritize morphological information, others focus on syntactic structures.",
+    "Measures of dispersion provide insights into the stability of word frequency across different text types.",
+    "Synchronic and diachronic corpus studies provide different perspectives on linguistic change.",
+    "Frequency lists generated from large corpora reveal significant patterns in language usage.",
+    "Relative frequency measures are more informative than absolute counts in corpus comparisons.",
+    "Tagging systems in corpus linguistics have evolved to accommodate multi-layered annotation schemes.",
+    "Collocation analysis plays a vital role in corpus linguistics. Identifying frequent co-occurrences of words provides insights into phraseology and lexical patterns.",
+    "Data structures in corpus research must be efficiently organized to allow for rapid querying and statistical analysis.",
+    "Logistic regression is frequently used in corpus linguistics to model categorical linguistic outcomes.",
+    "Data annotation is a crucial step in corpus construction, ensuring accuracy in linguistic analyses.",
+    "Text files containing linguistic data must be structured to allow compatibility with analysis tools.",
+    "Natural language processing techniques are widely used in corpus-based studies to extract relevant linguistic patterns.",
+    "Statistical significance tests help determine whether observed patterns in corpus data are due to chance.",
+    "Corpus-driven approaches focus on deriving linguistic theories from actual language use rather than pre-established models.",
+    "General corpus studies aim to cover a broad range of linguistic phenomena to ensure applicability across different research questions.",
+    "The independence of observations is a key assumption in statistical models applied to corpus data.",
+    "Word frequency lists provide insights into core vocabulary and the distribution of lexical items.",
+    "The representation of different text types in a corpus affects the generalizability of linguistic findings.",
+    "Corpus construction requires careful planning to ensure balance and representativeness of the data.",
+    "Parts-of-speech tagging is an essential preprocessing step in corpus linguistics, facilitating syntactic analysis.",
+    "Measures of dispersion indicate how evenly a word is distributed across different sections of a corpus.",
+    "The structure of corpus files must allow for efficient indexing and retrieval of linguistic information."
 ]
 
 # ---- Pantalla 1: Introducción ----
