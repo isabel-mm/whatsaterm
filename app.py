@@ -122,7 +122,6 @@ elif st.session_state.app_stage == "seleccion":
 
         col1, col2 = st.columns([2, 3])  # Más espacio para la columna de términos
         with col1:
-            st.markdown(f"### 📌 Párrafo {i+1}", unsafe_allow_html=True)
             st.markdown(f"<p>{parrafo}</p>", unsafe_allow_html=True)  # Justificado
 
         with col2:
